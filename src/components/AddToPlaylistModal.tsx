@@ -42,20 +42,36 @@ export default function AddToPlaylistModal({
     setLoading(true);
 
     try {
-      // Upsert track to ensure it exists and is up to date
-      const { error: trackError } = await supabase
+      // Check if track already exists by source_api_url
+      const { data: existingTrack, error: findError } = await supabase
         .from('tracks')
-        .upsert({
-          id: track.id,
-          title: track.title,
-          artist: track.artist,
-          source_api_url: track.source_api_url,
-          cover_url: track.cover_url,
-          duration: track.duration,
-        }, { onConflict: 'id' });
+        .select('id')
+        .eq('source_api_url', track.source_api_url)
+        .maybeSingle();
 
-      if (trackError) throw trackError;
-      const trackId = track.id;
+      if (findError) throw findError;
+
+      let trackId = '';
+
+      if (existingTrack) {
+        trackId = existingTrack.id;
+      } else {
+        // Insert track and let Supabase generate a UUID
+        const { data: newTrack, error: insertError } = await supabase
+          .from('tracks')
+          .insert({
+            title: track.title,
+            artist: track.artist,
+            source_api_url: track.source_api_url,
+            cover_url: track.cover_url,
+            duration: track.duration,
+          })
+          .select('id')
+          .single();
+
+        if (insertError) throw insertError;
+        trackId = newTrack.id;
+      }
 
       // Add to playlist
       const { error } = await supabase.from('playlist_tracks').insert({
