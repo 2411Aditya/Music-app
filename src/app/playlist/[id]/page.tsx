@@ -88,14 +88,7 @@ export default function PlaylistPage() {
     }
   }
 
-  async function handleDeletePlaylist() {
-    try {
-      await supabase.from('playlists').delete().eq('id', playlistId);
-      router.push('/');
-    } catch (err) {
-      console.error('Delete playlist error:', err);
-    }
-  }
+
 
   function handlePlayAll() {
     if (tracks.length > 0) {
@@ -107,6 +100,18 @@ export default function PlaylistPage() {
     if (tracks.length > 0) {
       const shuffled = [...tracks].sort(() => Math.random() - 0.5);
       playTrack(shuffled[0], shuffled);
+    }
+  }
+
+  async function handleDeletePlaylist() {
+    if (confirm('Are you sure you want to delete this playlist?')) {
+      const { error } = await supabase.from('playlists').delete().eq('id', playlistId);
+      if (!error) {
+        // Force a page reload to refresh the sidebar
+        window.location.href = '/';
+      } else {
+        alert('Failed to delete playlist');
+      }
     }
   }
 

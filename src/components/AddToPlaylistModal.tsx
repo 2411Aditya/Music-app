@@ -42,35 +42,20 @@ export default function AddToPlaylistModal({
     setLoading(true);
 
     try {
-      // First, ensure the track exists in Supabase
-      let trackId = track.id;
-
-      // Check if this is a search result (from JioSaavn) that needs to be saved
-      const { data: existingTrack } = await supabase
+      // Upsert track to ensure it exists and is up to date
+      const { error: trackError } = await supabase
         .from('tracks')
-        .select('id')
-        .eq('source_api_url', track.source_api_url)
-        .single();
+        .upsert({
+          id: track.id,
+          title: track.title,
+          artist: track.artist,
+          source_api_url: track.source_api_url,
+          cover_url: track.cover_url,
+          duration: track.duration,
+        }, { onConflict: 'id' });
 
-      if (existingTrack) {
-        trackId = existingTrack.id;
-      } else {
-        // Save track to Supabase first
-        const { data: newTrack, error: trackError } = await supabase
-          .from('tracks')
-          .insert({
-            title: track.title,
-            artist: track.artist,
-            source_api_url: track.source_api_url,
-            cover_url: track.cover_url,
-            duration: track.duration,
-          })
-          .select()
-          .single();
-
-        if (trackError) throw trackError;
-        if (newTrack) trackId = newTrack.id;
-      }
+      if (trackError) throw trackError;
+      const trackId = track.id;
 
       // Add to playlist
       const { error } = await supabase.from('playlist_tracks').insert({

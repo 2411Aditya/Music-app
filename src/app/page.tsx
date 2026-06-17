@@ -67,6 +67,9 @@ export default function HomePage() {
         </div>
         
         <div className="relative z-10 max-w-2xl">
+          <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--accent-glow)] border border-[var(--border-accent)] mb-6 animate-fade-in">
+            <span className="text-[var(--accent-tertiary)] font-medium text-sm">Welcome to Aditya's Personal music room 👋</span>
+          </div>
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">
             Discover Your <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">

@@ -129,7 +129,7 @@ export default function Sidebar({ onCreatePlaylist }: SidebarProps) {
         </div>
 
         {/* Playlist List */}
-        <div className="flex-1 overflow-y-auto px-2 pb-2">
+        <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-3 mt-2">
           {playlists.length === 0 ? (
             <div className={cn('px-3 py-4', !isCollapsed && 'text-center')}>
               {!isCollapsed && (
@@ -152,7 +152,7 @@ export default function Sidebar({ onCreatePlaylist }: SidebarProps) {
                 key={playlist.id}
                 href={`/playlist/${playlist.id}`}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group',
+                  'flex items-center gap-4 px-3 py-3 rounded-lg transition-all duration-200 group',
                   pathname === `/playlist/${playlist.id}`
                     ? 'bg-[var(--bg-hover)]'
                     : 'hover:bg-[var(--bg-elevated)]'
