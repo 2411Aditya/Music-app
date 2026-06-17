@@ -12,27 +12,28 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Search via official JioSaavn Autocomplete API
+    // Search via working JioSaavn API wrapper
     const response = await fetch(
-      `https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&includeMetaTags=1&query=${encodeURIComponent(query)}`
+      `https://jiosaavn-api-beta.vercel.app/search/songs?query=${encodeURIComponent(query)}`
     );
     const data = await response.json();
 
-    if (!data.songs?.data || !Array.isArray(data.songs.data)) {
+    if (!data.data?.results || !Array.isArray(data.data.results)) {
       return NextResponse.json({ tracks: [] });
     }
 
-    const tracks = data.songs.data.map((song: any) => {
-      // JioSaavn usually returns 50x50 images in search, replace with 500x500 for better quality
-      const highResImage = song.image?.replace('50x50', '500x500') || null;
+    const tracks = data.data.results.map((song: any) => {
+      // Find highest quality download URL
+      const downloadUrls = song.downloadUrl || [];
+      const bestAudio = downloadUrls[downloadUrls.length - 1]?.link || song.url;
       
       return {
         id: song.id,
-        title: song.title,
-        artist: song.more_info?.primary_artists || song.description?.split(' · ')[0] || 'Unknown Artist',
-        source_api_url: song.more_info?.vlink || song.url,
-        cover_url: highResImage,
-        duration: 0, // Autocomplete API doesn't provide duration easily
+        title: song.name,
+        artist: song.primaryArtists || 'Unknown Artist',
+        source_api_url: bestAudio,
+        cover_url: song.image?.[2]?.link || song.image?.[1]?.link || song.image?.[0]?.link || null,
+        duration: parseInt(song.duration || '0', 10),
       };
     });
 
