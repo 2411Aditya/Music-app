@@ -68,9 +68,9 @@ export default function SearchPage() {
   ];
 
   return (
-    <div className="min-h-full p-4 md:p-8 pb-32">
+    <div className="min-h-full p-4 pt-10 md:p-8 md:pt-12 pb-32">
       {/* Search Header */}
-      <div className="max-w-4xl mb-10 mx-auto">
+      <div className="max-w-4xl mb-10 mx-auto mt-4 md:mt-0">
         <div className="relative shadow-2xl rounded-full">
           <SearchIcon
             size={24}
