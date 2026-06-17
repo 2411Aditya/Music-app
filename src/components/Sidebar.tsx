@@ -8,6 +8,7 @@ import {
   Search,
   Library,
   Plus,
+  ListMusic,
   Disc3,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
