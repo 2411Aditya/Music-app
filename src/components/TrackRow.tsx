@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Play, Pause, X, Clock } from 'lucide-react';
+import { Play, Pause, X, Plus, Clock } from 'lucide-react';
 import { usePlayer } from '@/context/PlayerContext';
 import { Track } from '@/lib/types';
 import { formatDuration, cn } from '@/lib/utils';
@@ -114,10 +114,24 @@ export default function TrackRow({
         {formatDuration(track.duration)}
       </span>
 
+      {/* Add to Playlist Button */}
+      {!showRemove && onAddToPlaylist && (
+        <button
+          className="opacity-100 md:opacity-0 md:group-hover:opacity-100 text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-all ml-2 p-1.5 rounded-full hover:bg-[var(--bg-hover)] flex-shrink-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToPlaylist(track);
+          }}
+          title="Add to playlist"
+        >
+          <Plus size={16} />
+        </button>
+      )}
+
       {/* Remove Button */}
       {showRemove && onRemove && (
         <button
-          className="opacity-0 group-hover:opacity-100 text-[var(--text-muted)] hover:text-[var(--error)] transition-all ml-2"
+          className="opacity-100 md:opacity-0 md:group-hover:opacity-100 text-[var(--text-muted)] hover:text-[var(--error)] transition-all ml-2 p-1.5 rounded-full hover:bg-[var(--bg-hover)] flex-shrink-0"
           onClick={(e) => {
             e.stopPropagation();
             onRemove(track.id);

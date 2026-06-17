@@ -12,12 +12,14 @@ import {
   ListMusic,
   Trash2,
   Music2,
+  Plus,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Track, Playlist } from '@/lib/types';
 import { usePlayer } from '@/context/PlayerContext';
 import { formatDuration, cn } from '@/lib/utils';
 import TrackRow from '@/components/TrackRow';
+import AddSongsToPlaylistModal from '@/components/AddSongsToPlaylistModal';
 import Image from 'next/image';
 
 export default function PlaylistPage() {
@@ -29,6 +31,7 @@ export default function PlaylistPage() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAddSongsModal, setShowAddSongsModal] = useState(false);
   const { playTrack, currentTrack, isPlaying } = usePlayer();
 
   useEffect(() => {
@@ -250,8 +253,17 @@ export default function PlaylistPage() {
           onClick={handleShuffle}
           disabled={tracks.length === 0}
           className="text-[var(--text-secondary)] hover:text-white transition-colors disabled:opacity-50"
+          title="Shuffle"
         >
           <Shuffle size={22} />
+        </button>
+
+        <button
+          onClick={() => setShowAddSongsModal(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-full border border-[var(--border-subtle)] text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] hover:border-[var(--accent-primary)] transition-all"
+        >
+          <Plus size={16} />
+          <span>Add Songs</span>
         </button>
 
         <div className="ml-auto relative">
@@ -289,10 +301,10 @@ export default function PlaylistPage() {
               Search for songs and add them to this playlist
             </p>
             <button
-              onClick={() => router.push('/search')}
+              onClick={() => setShowAddSongsModal(true)}
               className="inline-flex px-6 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white hover:opacity-90 transition-all hover:scale-105"
             >
-              Find Songs
+              Add Songs
             </button>
           </div>
         ) : (
@@ -319,6 +331,14 @@ export default function PlaylistPage() {
           </>
         )}
       </div>
+
+      {/* Add Songs Modal */}
+      <AddSongsToPlaylistModal
+        isOpen={showAddSongsModal}
+        onClose={() => setShowAddSongsModal(false)}
+        playlistId={playlistId}
+        onSongsAdded={fetchPlaylistData}
+      />
     </div>
   );
 }
