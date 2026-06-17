@@ -13,10 +13,12 @@ import {
   Shuffle,
   ListMusic,
   Maximize2,
+  Plus,
 } from 'lucide-react';
 import { usePlayer } from '@/context/PlayerContext';
 import { formatDuration, cn } from '@/lib/utils';
 import Image from 'next/image';
+import AddToPlaylistModal from '@/components/AddToPlaylistModal';
 
 export default function PlayerBar() {
   const {
@@ -35,6 +37,7 @@ export default function PlayerBar() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragProgress, setDragProgress] = useState(0);
   const [prevVolume, setPrevVolume] = useState(0.7);
+  const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   const displayProgress = isDragging ? dragProgress : progress;
@@ -137,6 +140,14 @@ export default function PlayerBar() {
             {currentTrack.artist}
           </p>
         </div>
+        {/* Add to Playlist button */}
+        <button
+          onClick={() => setShowAddToPlaylist(true)}
+          className="text-[var(--text-secondary)] hover:text-white p-2 rounded-full hover:bg-[var(--bg-hover)] transition-all flex-shrink-0"
+          title="Add to playlist"
+        >
+          <Plus size={18} />
+        </button>
         {/* Mobile Play Controls */}
         <div className="flex md:hidden items-center gap-3 pr-2">
           <button onClick={togglePlay} className="text-white">
@@ -239,6 +250,13 @@ export default function PlayerBar() {
           style={{ width: `${progressPercent}%` }}
         />
       </div>
+
+      {/* Add to Playlist Modal */}
+      <AddToPlaylistModal
+        isOpen={showAddToPlaylist}
+        onClose={() => setShowAddToPlaylist(false)}
+        track={currentTrack}
+      />
     </div>
   );
 }
