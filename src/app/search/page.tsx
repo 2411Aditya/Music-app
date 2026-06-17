@@ -73,15 +73,15 @@ export default function SearchPage() {
       <div className="max-w-4xl mb-10 mx-auto mt-4 md:mt-0">
         <div className="relative shadow-2xl rounded-full">
           <SearchIcon
-            size={24}
-            className="absolute left-6 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+            size={20}
+            className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
           />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="What do you want to listen to?"
-            className="w-full pl-14 pr-14 py-5 rounded-full bg-[var(--bg-elevated)] border-2 border-[var(--border-subtle)] text-white text-lg placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-4 focus:ring-[var(--accent-glow)] transition-all shadow-inner"
+            className="w-full pl-12 pr-12 py-3 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-white text-base placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-glow)] transition-all shadow-inner"
             autoFocus
           />
           {query && (
