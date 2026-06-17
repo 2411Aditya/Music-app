@@ -96,11 +96,11 @@ export default function PlayerBar() {
   }
 
   return (
-    <div className="h-[80px] glass-strong border-t border-[var(--border-subtle)] flex items-center px-4 gap-4 z-50">
+    <div className="h-[64px] md:h-[80px] glass-strong border-t border-[var(--border-subtle)] flex items-center px-3 md:px-4 gap-2 md:gap-4 z-50">
       {/* Left: Track Info */}
-      <div className="flex items-center gap-3 w-[280px] min-w-[180px]">
-        <div className="relative group flex-shrink-0">
-          <div className="w-14 h-14 rounded-lg overflow-hidden bg-[var(--bg-elevated)]">
+      <div className="flex items-center gap-2 md:gap-3 flex-1 md:flex-none md:w-[280px] min-w-0">
+        <div className="relative flex-shrink-0">
+          <div className="w-10 h-10 md:w-14 md:h-14 rounded-md overflow-hidden bg-[var(--bg-elevated)]">
             {currentTrack.cover_url ? (
               <Image
                 src={currentTrack.cover_url}
@@ -120,7 +120,7 @@ export default function PlayerBar() {
             )}
           </div>
           {isPlaying && (
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[var(--accent-primary)] flex items-center justify-center animate-pulse-glow">
+            <div className="hidden md:flex absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[var(--accent-primary)] items-center justify-center animate-pulse-glow">
               <div className="equalizer" style={{ height: 10, gap: 1 }}>
                 <div className="equalizer-bar" style={{ width: 2 }} />
                 <div className="equalizer-bar" style={{ width: 2 }} />
@@ -129,7 +129,7 @@ export default function PlayerBar() {
             </div>
           )}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold truncate text-white animate-slide-right">
             {currentTrack.title}
           </p>
@@ -137,10 +137,16 @@ export default function PlayerBar() {
             {currentTrack.artist}
           </p>
         </div>
+        {/* Mobile Play Controls */}
+        <div className="flex md:hidden items-center gap-3 pr-2">
+          <button onClick={togglePlay} className="text-white">
+            {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" />}
+          </button>
+        </div>
       </div>
 
-      {/* Center: Controls + Progress */}
-      <div className="flex-1 flex flex-col items-center max-w-[720px] mx-auto">
+      {/* Center: Controls + Progress (Hidden on mobile) */}
+      <div className="hidden md:flex flex-1 flex-col items-center max-w-[720px] mx-auto">
         {/* Playback Controls */}
         <div className="flex items-center gap-4 mb-1">
           <button className="text-[var(--text-muted)] hover:text-white transition-colors">
@@ -200,8 +206,8 @@ export default function PlayerBar() {
         </div>
       </div>
 
-      {/* Right: Volume */}
-      <div className="flex items-center gap-2 w-[180px] justify-end">
+      {/* Right: Volume (Hidden on mobile) */}
+      <div className="hidden md:flex items-center gap-2 w-[180px] justify-end">
         <button
           onClick={toggleMute}
           className="text-[var(--text-secondary)] hover:text-white transition-colors"
@@ -224,6 +230,14 @@ export default function PlayerBar() {
             }}
           />
         </div>
+      </div>
+      
+      {/* Mobile Progress Bar (thin line at top of player) */}
+      <div className="md:hidden absolute top-0 left-0 right-0 h-0.5 bg-white/10">
+        <div 
+          className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"
+          style={{ width: `${progressPercent}%` }}
+        />
       </div>
     </div>
   );

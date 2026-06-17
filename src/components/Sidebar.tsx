@@ -58,7 +58,7 @@ export default function Sidebar({ onCreatePlaylist }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'flex flex-col h-full transition-all duration-300 ease-out',
+        'hidden md:flex flex-col h-full transition-all duration-300 ease-out z-20',
         isCollapsed ? 'w-[72px]' : 'w-[280px]'
       )}
       style={{ minWidth: isCollapsed ? 72 : 280 }}

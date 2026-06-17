@@ -169,7 +169,7 @@ export default function PlaylistPage() {
           />
         )}
 
-        <div className="relative px-8 pt-6 pb-8">
+        <div className="relative px-4 md:px-8 pt-6 pb-8">
           {/* Back Button */}
           <button
             onClick={() => router.back()}
@@ -228,7 +228,7 @@ export default function PlaylistPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-4 px-8 py-5">
+      <div className="flex items-center gap-4 px-4 md:px-8 py-5">
         <button
           onClick={handlePlayAll}
           disabled={tracks.length === 0}
@@ -271,7 +271,7 @@ export default function PlaylistPage() {
       </div>
 
       {/* Track List */}
-      <div className="px-8 pb-32">
+      <div className="px-4 md:px-8 pb-32">
         {tracks.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 rounded-2xl bg-[var(--bg-surface)] flex items-center justify-center mx-auto mb-4">

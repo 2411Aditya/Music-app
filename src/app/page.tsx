@@ -51,31 +51,90 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full pb-32">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1040] via-[var(--bg-secondary)] to-[var(--bg-secondary)]" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--accent-primary)] rounded-full blur-[128px] opacity-10" />
-        <div className="absolute top-20 right-1/4 w-72 h-72 bg-[var(--accent-secondary)] rounded-full blur-[128px] opacity-10" />
-
-        <div className="relative px-8 pt-10 pb-6">
-          <h1 className="text-3xl font-bold text-white mb-1 animate-fade-in">
-            {getGreeting()}
-          </h1>
-          <p className="text-[var(--text-secondary)] animate-fade-in">
-            Discover and stream your favorite music
-          </p>
+      <section className="relative h-[250px] md:h-[300px] flex items-end p-4 md:p-8 overflow-hidden rounded-t-xl">
+        <div className="absolute inset-0">
+          <Image
+            src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80"
+            alt="Hero background"
+            fill
+            className="object-cover opacity-40 mix-blend-overlay"
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-secondary)] via-transparent to-transparent" />
         </div>
-      </div>
+        
+        <div className="relative z-10 max-w-2xl">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight">
+            Discover Your <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+              Next Favorite Song
+            </span>
+          </h1>
+        </div>
+      </section>
 
-      {/* Quick Play Playlists */}
-      {playlists.length > 0 && (
-        <section className="px-8 pb-8">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 stagger-children">
-            {playlists.slice(0, 6).map((playlist) => (
+      <div className="px-4 md:px-8 space-y-12 mt-8">
+        {/* Quick Play Playlists */}
+        {playlists.length > 0 && (
+          <section>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 stagger-children">
+              {playlists.slice(0, 6).map((playlist) => (
+                <Link
+                  key={playlist.id}
+                  href={`/playlist/${playlist.id}`}
+                  className="flex items-center gap-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300 group overflow-hidden"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center flex-shrink-0">
+                    <ListMusic size={22} className="text-white" />
+                  </div>
+                  <span className="text-sm font-semibold text-white truncate pr-4">
+                    {playlist.name}
+                  </span>
+                  <div className="ml-auto mr-3 w-10 h-10 rounded-full bg-[var(--accent-primary)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-xl translate-y-1 group-hover:translate-y-0">
+                    <Play size={18} className="text-white ml-0.5" fill="white" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Recently Added Tracks */}
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <Sparkles size={20} className="text-[var(--accent-primary)]" />
+              <h2 className="text-xl font-bold text-white">Recently Added</h2>
+            </div>
+            {tracks.length > 5 && (
+              <button className="text-sm font-semibold text-[var(--text-secondary)] hover:text-white transition-colors flex items-center gap-1">
+                Show all <ChevronRight size={16} />
+              </button>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="p-3">
+                  <div className="aspect-square rounded-lg bg-[var(--bg-surface)] animate-shimmer mb-3" />
+                  <div className="h-4 bg-[var(--bg-surface)] rounded animate-shimmer mb-2 w-3/4" />
+                  <div className="h-3 bg-[var(--bg-surface)] rounded animate-shimmer w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : tracks.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 rounded-2xl bg-[var(--bg-surface)] flex items-center justify-center mx-auto mb-4">
+                <Sparkles size={32} className="text-[var(--text-muted)]" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">No tracks yet</h3>
+              <p className="text-sm text-[var(--text-secondary)] mb-4">
+                Search for music to add tracks to your library
+              </p>
               <Link
-                key={playlist.id}
                 href={`/playlist/${playlist.id}`}
                 className="flex items-center gap-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300 group overflow-hidden"
               >

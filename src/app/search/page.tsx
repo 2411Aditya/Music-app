@@ -68,7 +68,7 @@ export default function SearchPage() {
   ];
 
   return (
-    <div className="min-h-full p-8">
+    <div className="min-h-full p-4 md:p-8 pb-32">
       {/* Search Header */}
       <div className="max-w-2xl mb-8">
         <div className="relative">
