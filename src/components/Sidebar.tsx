@@ -8,9 +8,6 @@ import {
   Search,
   Library,
   Plus,
-  Music2,
-  ListMusic,
-  ChevronRight,
   Disc3,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -25,6 +22,14 @@ export default function Sidebar({ onCreatePlaylist }: SidebarProps) {
   const pathname = usePathname();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  async function fetchPlaylists() {
+    const { data } = await supabase
+      .from('playlists')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data) setPlaylists(data);
+  }
 
   useEffect(() => {
     fetchPlaylists();
@@ -41,14 +46,6 @@ export default function Sidebar({ onCreatePlaylist }: SidebarProps) {
       supabase.removeChannel(channel);
     };
   }, []);
-
-  async function fetchPlaylists() {
-    const { data } = await supabase
-      .from('playlists')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (data) setPlaylists(data);
-  }
 
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },

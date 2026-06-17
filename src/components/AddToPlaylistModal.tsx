@@ -21,13 +21,6 @@ export default function AddToPlaylistModal({
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchPlaylists();
-      setAddedTo(new Set());
-    }
-  }, [isOpen]);
-
   async function fetchPlaylists() {
     const { data } = await supabase
       .from('playlists')
@@ -35,6 +28,14 @@ export default function AddToPlaylistModal({
       .order('created_at', { ascending: false });
     if (data) setPlaylists(data);
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchPlaylists();
+    } else {
+      setAddedTo(new Set()); // Reset when modal closes to avoid setState during open render cascade
+    }
+  }, [isOpen]);
 
   async function addToPlaylist(playlistId: string) {
     if (!track) return;
