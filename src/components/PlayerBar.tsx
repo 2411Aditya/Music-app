@@ -39,43 +39,65 @@ export default function PlayerBar() {
   const [prevVolume, setPrevVolume] = useState(0.7);
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const progressBarRefMobile = useRef<HTMLDivElement>(null);
+  const dragProgressRef = useRef(0);
 
   const displayProgress = isDragging ? dragProgress : progress;
   const progressPercent = duration > 0 ? (displayProgress / duration) * 100 : 0;
 
-  function handleProgressMouseDown(e: React.MouseEvent) {
-    setIsDragging(true);
-    updateProgressFromMouse(e);
-  }
-
-  function updateProgressFromMouse(e: React.MouseEvent | MouseEvent) {
-    if (!progressBarRef.current) return;
-    const rect = progressBarRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+  function updateProgressFromX(clientX: number, isMobile: boolean) {
+    const ref = isMobile ? progressBarRefMobile : progressBarRef;
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const percent = x / rect.width;
     const newTime = percent * duration;
     setDragProgress(newTime);
+    dragProgressRef.current = newTime;
   }
 
-  useEffect(() => {
-    if (!isDragging) return;
+  function handleProgressMouseDown(e: React.MouseEvent) {
+    setIsDragging(true);
+    updateProgressFromX(e.clientX, false);
 
-    function handleMouseMove(e: MouseEvent) {
-      updateProgressFromMouse(e);
-    }
-
-    function handleMouseUp() {
-      setIsDragging(false);
-      seekTo(dragProgress);
-    }
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+    const handleMouseMove = (event: MouseEvent) => {
+      updateProgressFromX(event.clientX, false);
     };
-  }, [isDragging, dragProgress, seekTo]);
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      seekTo(dragProgressRef.current);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }
+
+  function handleProgressTouchStart(e: React.TouchEvent) {
+    setIsDragging(true);
+    const touch = e.touches[0];
+    if (!touch) return;
+    updateProgressFromX(touch.clientX, true);
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const t = event.touches[0];
+      if (t) {
+        updateProgressFromX(t.clientX, true);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+      seekTo(dragProgressRef.current);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd);
+  }
 
   function toggleMute() {
     if (volume > 0) {
@@ -149,9 +171,36 @@ export default function PlayerBar() {
           <Plus size={18} />
         </button>
         {/* Mobile Play Controls */}
-        <div className="flex md:hidden items-center gap-3 pr-2">
-          <button onClick={togglePlay} className="text-white">
+        <div className="flex md:hidden items-center gap-3 pr-2 flex-shrink-0">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              prevTrack();
+            }}
+            className="text-[var(--text-secondary)] hover:text-white transition-colors p-1"
+            title="Previous Song"
+          >
+            <SkipBack size={20} fill="currentColor" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              togglePlay();
+            }}
+            className="text-white hover:scale-105 active:scale-95 transition-transform p-1"
+            title={isPlaying ? "Pause" : "Play"}
+          >
             {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" />}
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              nextTrack();
+            }}
+            className="text-[var(--text-secondary)] hover:text-white transition-colors p-1"
+            title="Next Song"
+          >
+            <SkipForward size={20} fill="currentColor" />
           </button>
         </div>
       </div>
@@ -243,12 +292,23 @@ export default function PlayerBar() {
         </div>
       </div>
       
-      {/* Mobile Progress Bar (thin line at top of player) */}
-      <div className="md:hidden absolute top-0 left-0 right-0 h-0.5 bg-white/10">
-        <div 
-          className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"
-          style={{ width: `${progressPercent}%` }}
-        />
+      {/* Mobile Progress Bar (interactive touch/drag seek) */}
+      <div 
+        ref={progressBarRefMobile}
+        className="md:hidden absolute top-[-6px] left-0 right-0 h-4 flex items-center cursor-pointer z-50 group"
+        onTouchStart={handleProgressTouchStart}
+        onMouseDown={handleProgressMouseDown}
+      >
+        <div className="w-full h-[3px] bg-white/10 relative group-hover:h-1 transition-all">
+          <div 
+            className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"
+            style={{ width: `${progressPercent}%` }}
+          />
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white shadow-lg transition-transform scale-100 group-hover:scale-110"
+            style={{ left: `calc(${progressPercent}% - 5px)` }}
+          />
+        </div>
       </div>
 
       {/* Add to Playlist Modal */}
