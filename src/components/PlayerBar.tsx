@@ -56,12 +56,12 @@ export default function PlayerBar() {
     dragProgressRef.current = newTime;
   }
 
-  function handleProgressMouseDown(e: React.MouseEvent) {
+  function handleProgressMouseDown(e: React.MouseEvent, isMobile: boolean) {
     setIsDragging(true);
-    updateProgressFromX(e.clientX, false);
+    updateProgressFromX(e.clientX, isMobile);
 
     const handleMouseMove = (event: MouseEvent) => {
-      updateProgressFromX(event.clientX, false);
+      updateProgressFromX(event.clientX, isMobile);
     };
 
     const handleMouseUp = () => {
@@ -75,16 +75,16 @@ export default function PlayerBar() {
     document.addEventListener('mouseup', handleMouseUp);
   }
 
-  function handleProgressTouchStart(e: React.TouchEvent) {
+  function handleProgressTouchStart(e: React.TouchEvent, isMobile: boolean) {
     setIsDragging(true);
     const touch = e.touches[0];
     if (!touch) return;
-    updateProgressFromX(touch.clientX, true);
+    updateProgressFromX(touch.clientX, isMobile);
 
     const handleTouchMove = (event: TouchEvent) => {
       const t = event.touches[0];
       if (t) {
-        updateProgressFromX(t.clientX, true);
+        updateProgressFromX(t.clientX, isMobile);
       }
     };
 
@@ -121,56 +121,60 @@ export default function PlayerBar() {
   }
 
   return (
-    <div className="h-[64px] md:h-[80px] glass-strong border-t border-[var(--border-subtle)] flex items-center px-3 md:px-4 gap-2 md:gap-4 z-50">
-      {/* Left: Track Info */}
-      <div className="flex items-center gap-2 md:gap-3 flex-1 md:flex-none md:w-[280px] min-w-0">
-        <div className="relative flex-shrink-0">
-          <div className="w-10 h-10 md:w-14 md:h-14 rounded-md overflow-hidden bg-[var(--bg-elevated)]">
-            {currentTrack.cover_url ? (
-              <Image
-                src={currentTrack.cover_url}
-                alt={currentTrack.title}
-                width={56}
-                height={56}
-                className={cn(
-                  'w-full h-full object-cover transition-transform duration-500',
-                  isPlaying && 'scale-105'
-                )}
-                unoptimized
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <ListMusic size={20} className="text-[var(--text-muted)]" />
+    <div className="h-[105px] md:h-[80px] glass-strong border-t border-[var(--border-subtle)] flex flex-col justify-between py-2 px-3 md:px-4 md:flex-row md:items-center md:py-0 md:gap-4 z-50 animate-slide-up">
+      {/* Top Row (Mobile) / Left Content (Desktop): Info + Mobile Controls */}
+      <div className="flex items-center justify-between w-full md:w-auto md:flex-none md:w-[280px] min-w-0">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+          <div className="relative flex-shrink-0">
+            <div className="w-10 h-10 md:w-14 md:h-14 rounded-md overflow-hidden bg-[var(--bg-elevated)]">
+              {currentTrack.cover_url ? (
+                <Image
+                  src={currentTrack.cover_url}
+                  alt={currentTrack.title}
+                  width={56}
+                  height={56}
+                  className={cn(
+                    'w-full h-full object-cover transition-transform duration-500',
+                    isPlaying && 'scale-105'
+                  )}
+                  unoptimized
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <ListMusic size={20} className="text-[var(--text-muted)]" />
+                </div>
+              )}
+            </div>
+            {isPlaying && (
+              <div className="hidden md:flex absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[var(--accent-primary)] items-center justify-center animate-pulse-glow">
+                <div className="equalizer" style={{ height: 10, gap: 1 }}>
+                  <div className="equalizer-bar" style={{ width: 2 }} />
+                  <div className="equalizer-bar" style={{ width: 2 }} />
+                  <div className="equalizer-bar" style={{ width: 2 }} />
+                </div>
               </div>
             )}
           </div>
-          {isPlaying && (
-            <div className="hidden md:flex absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[var(--accent-primary)] items-center justify-center animate-pulse-glow">
-              <div className="equalizer" style={{ height: 10, gap: 1 }}>
-                <div className="equalizer-bar" style={{ width: 2 }} />
-                <div className="equalizer-bar" style={{ width: 2 }} />
-                <div className="equalizer-bar" style={{ width: 2 }} />
-              </div>
-            </div>
-          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold truncate text-white">
+              {currentTrack.title}
+            </p>
+            <p className="text-xs text-[var(--text-secondary)] truncate">
+              {currentTrack.artist}
+            </p>
+          </div>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold truncate text-white animate-slide-right">
-            {currentTrack.title}
-          </p>
-          <p className="text-xs text-[var(--text-secondary)] truncate">
-            {currentTrack.artist}
-          </p>
-        </div>
-        {/* Add to Playlist button */}
+
+        {/* Add to Playlist button (Desktop & Mobile) */}
         <button
           onClick={() => setShowAddToPlaylist(true)}
-          className="text-[var(--text-secondary)] hover:text-white p-2 rounded-full hover:bg-[var(--bg-hover)] transition-all flex-shrink-0"
+          className="text-[var(--text-secondary)] hover:text-white p-2 rounded-full hover:bg-[var(--bg-hover)] transition-all flex-shrink-0 mx-1"
           title="Add to playlist"
         >
           <Plus size={18} />
         </button>
-        {/* Mobile Play Controls */}
+
+        {/* Mobile Play Controls (Hidden on desktop) */}
         <div className="flex md:hidden items-center gap-3 pr-2 flex-shrink-0">
           <button
             onClick={(e) => {
@@ -205,7 +209,7 @@ export default function PlayerBar() {
         </div>
       </div>
 
-      {/* Center: Controls + Progress (Hidden on mobile) */}
+      {/* Center: Controls + Progress (Desktop layout) */}
       <div className="hidden md:flex flex-1 flex-col items-center max-w-[720px] mx-auto">
         {/* Playback Controls */}
         <div className="flex items-center gap-4 mb-1">
@@ -247,7 +251,8 @@ export default function PlayerBar() {
           <div
             ref={progressBarRef}
             className="flex-1 h-5 flex items-center cursor-pointer group"
-            onMouseDown={handleProgressMouseDown}
+            onMouseDown={(e) => handleProgressMouseDown(e, false)}
+            onTouchStart={(e) => handleProgressTouchStart(e, false)}
           >
             <div className="w-full h-1 rounded-full bg-white/10 relative group-hover:h-1.5 transition-all">
               <div
@@ -264,6 +269,33 @@ export default function PlayerBar() {
             {formatDuration(duration)}
           </span>
         </div>
+      </div>
+
+      {/* Bottom Row (Mobile): Seeker Bar + Timestamps */}
+      <div className="md:hidden flex items-center gap-2 w-full px-1">
+        <span className="text-[10px] text-[var(--text-muted)] w-8 text-right tabular-nums">
+          {formatDuration(displayProgress)}
+        </span>
+        <div
+          ref={progressBarRefMobile}
+          className="flex-1 h-5 flex items-center cursor-pointer group"
+          onMouseDown={(e) => handleProgressMouseDown(e, true)}
+          onTouchStart={(e) => handleProgressTouchStart(e, true)}
+        >
+          <div className="w-full h-[3px] bg-white/10 relative">
+            <div
+              className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"
+              style={{ width: `${progressPercent}%` }}
+            />
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white shadow-lg"
+              style={{ left: `calc(${progressPercent}% - 5px)` }}
+            />
+          </div>
+        </div>
+        <span className="text-[10px] text-[var(--text-muted)] w-8 tabular-nums">
+          {formatDuration(duration)}
+        </span>
       </div>
 
       {/* Right: Volume (Hidden on mobile) */}
@@ -288,25 +320,6 @@ export default function PlayerBar() {
               height: 4,
               borderRadius: 2,
             }}
-          />
-        </div>
-      </div>
-      
-      {/* Mobile Progress Bar (interactive touch/drag seek) */}
-      <div 
-        ref={progressBarRefMobile}
-        className="md:hidden absolute top-[-6px] left-0 right-0 h-4 flex items-center cursor-pointer z-50 group"
-        onTouchStart={handleProgressTouchStart}
-        onMouseDown={handleProgressMouseDown}
-      >
-        <div className="w-full h-[3px] bg-white/10 relative group-hover:h-1 transition-all">
-          <div 
-            className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"
-            style={{ width: `${progressPercent}%` }}
-          />
-          <div
-            className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white shadow-lg transition-transform scale-100 group-hover:scale-110"
-            style={{ left: `calc(${progressPercent}% - 5px)` }}
           />
         </div>
       </div>

@@ -28,7 +28,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Sidebar onCreatePlaylist={() => setShowCreatePlaylist(true)} />
 
           {/* Main Content */}
-          <main className="flex-1 rounded-xl bg-[var(--bg-secondary)] overflow-y-auto overflow-x-hidden relative pb-[80px] md:pb-0">
+          <main className="flex-1 rounded-xl bg-[var(--bg-secondary)] overflow-y-auto overflow-x-hidden relative pb-[115px] md:pb-0">
             {children}
           </main>
           
