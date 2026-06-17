@@ -55,7 +55,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         if (prev.length > 0) {
           const [nextTrack, ...rest] = prev;
           setCurrentTrack(nextTrack);
-          audio.src = getStreamUrl(nextTrack.id);
+          audio.src = nextTrack.source_api_url || getStreamUrl(nextTrack.id);
           audio.play().catch(console.error);
           setIsPlaying(true);
           return rest;
@@ -87,7 +87,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     audio.load();
 
     setCurrentTrack(track);
-    audio.src = getStreamUrl(track.id);
+    // Use direct stream URL from API/DB, fallback to proxy API if needed
+    audio.src = track.source_api_url || getStreamUrl(track.id);
     audio.play().catch(console.error);
     setIsPlaying(true);
     setProgress(0);
@@ -133,7 +134,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.pause();
       audio.src = '';
       audio.load();
-      audio.src = getStreamUrl(next.id);
+      audio.src = next.source_api_url || getStreamUrl(next.id);
       audio.play().catch(console.error);
       setIsPlaying(true);
       setProgress(0);
