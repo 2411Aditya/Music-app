@@ -46,32 +46,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Track not found' }, { status: 404 });
   }
 
-  // 2. Resolve the actual audio URL from the JioSaavn API
-  let audioUrl = track.source_api_url;
+  // 2. The source_api_url is now a direct MP3 link (vlink) or fallback
+  const audioUrl = track.source_api_url;
   
-  try {
-    // If the source URL is a JioSaavn API endpoint, resolve the actual download URL
-    if (track.source_api_url.includes('saavn.dev')) {
-      const apiResponse = await fetch(track.source_api_url);
-      const apiData = await apiResponse.json();
-      
-      if (apiData.success && apiData.data) {
-        const songData = Array.isArray(apiData.data) ? apiData.data[0] : apiData.data;
-        const downloadUrls = songData.downloadUrl || [];
-        // Get highest quality available (last item = highest bitrate)
-        const bestQuality = downloadUrls[downloadUrls.length - 1];
-        if (bestQuality?.url) {
-          audioUrl = bestQuality.url;
-        } else {
-          return NextResponse.json({ error: 'No audio URL found' }, { status: 404 });
-        }
-      } else {
-        return NextResponse.json({ error: 'Failed to resolve audio URL' }, { status: 502 });
-      }
-    }
-  } catch (err) {
-    console.error('API resolution error:', err);
-    return NextResponse.json({ error: 'Failed to resolve audio source' }, { status: 502 });
+  if (!audioUrl || (!audioUrl.endsWith('.mp3') && !audioUrl.endsWith('.mp4'))) {
+    // If we don't have a direct MP3 link, we can't stream it without a decrypter
+    return NextResponse.json({ error: 'No audio URL available or unsupported format' }, { status: 404 });
   }
 
   // 3. Download to temp directory

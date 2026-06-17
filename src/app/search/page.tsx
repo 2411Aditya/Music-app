@@ -81,7 +81,7 @@ export default function SearchPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="What do you want to listen to?"
-            className="w-full pl-12 pr-12 py-4 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-white text-base placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-glow)] transition-all"
+            className="w-full px-12 py-4 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-white text-base placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-glow)] transition-all"
             autoFocus
           />
           {query && (
